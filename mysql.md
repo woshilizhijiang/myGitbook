@@ -1,7 +1,12 @@
-
-1
-
+# mysql-技术内幕Innodb
 
 
-发发呆 
+
+### chapter 4 表-table
+
+#### 4.1索引组织表（index organized table）
+
+
+
+
 
