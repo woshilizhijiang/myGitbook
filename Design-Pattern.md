@@ -2,6 +2,16 @@
 
 ### Decorator Pattern（装饰模式）
 
+### 学习的契机：
+
+SpringBoot分析spring5的webFlux时；HttpHandler、WebHandler、WebHandlerDecorator、HttpWebHandlerAdapter
+
+
+
+<img src="/Users/lzj11/Documents/webFlux01.png" alt="webFlux01" style="zoom:50%;" />
+
+
+
 #### 定义：
 
 #### 组成：
