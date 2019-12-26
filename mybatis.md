@@ -18,6 +18,17 @@
 
 
 
+####  2.mybatis关于通用 Mapper 中 selectByPrimaryKey 无法根据id查询
+
+问题描述：
+数据库表数据主键bigint；
+mybatis的mapper中为long型；查询selectByPrimaryKey 是出错。
+
+解决办法：
+mybatis的mapper中为**long型改为Long**。
+
+参考依据：https://blog.csdn.net/qq_37119719/article/details/85250496
+
 
 
 
