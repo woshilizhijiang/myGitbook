@@ -31,6 +31,42 @@ mybatis的mapper中为**long型改为Long**。
 
 
 
+### mybatis分析(基于3.4.6版本)
+
+#### 1.mybatis独立使用步骤
+
+1. **建立PO**
+
+2. **建立Mapper**--->（dao层）
+
+3. **建立配置文件**
+
+   spring boot mybatis通用jar在tk.mybatis.mapper.autoconfigure.MybatisProperties对应配置属性；详见源码和《Spring源码深度解析（第2版）.pdf》mybatis篇章
+
+4. **创建映射文件**
+
+5. **创建单元测试类**
+
+
+
+#### 2.mybatis源码分析
+
+**1.org.apache.ibatis.session.SqlSessionFactory---设置mybatis请求共享到Spring application的context中。**
+
+spring通过**org.mybatis.spring.SqlSessionFactoryBean**封装了Mybatis中的实现。
+
+
+
+**2.org.mybatis.spring.mapper.MapperFactoryBean---设置mybatis映射端口**
+
+
+
+**3.org.mybatis.spring.mapper.MapperScannerConfigurer---进行包扫描配置**
+
+
+
+
+
 
 
 
