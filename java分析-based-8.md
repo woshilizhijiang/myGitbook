@@ -2,6 +2,71 @@
 
 ## 基础源码
 
+### 枚举详解（enum:java.lang.Enum）
+
+#### 声明枚举类
+
+```java
+[public] enum 枚举类型名称
+  [implements 接口]
+{
+  枚举值；
+  变量成员声明及初始化;
+  方法声明及方法体;
+}
+```
+
+枚举值：即对象实例
+变量和常量
+
+#### 特点
+
+- 一个类
+- 所有枚举类型都隐含继承（扩展）自java.lang.Enum，枚举类不能再继承其他任何类型；
+- 包含方法和变量名称
+- 构造方法必须是包内私有或者私有的，定义在枚举类开头的常量会自动创建，不能显示的调用枚举类的构造方法
+
+#### 默认方法
+
+- **静态values：用于获得枚举类型的枚举值的数组；**
+- toString：返回枚举值字符串描述
+- **valueOf：将字符串形式表示的枚举值转化为枚举类型对象**
+- ordinal：获得对象在枚举类型中的位置索引
+
+#### 使用场景
+
+常量、switch、向枚举中添加新的方法、覆盖枚举的方法、实现接口、使用接口组织枚举、
+
+
+
+
+
+### 注解
+
+#### annotation basic(基础注解)
+
+
+
+#### meta-annotaions(元注解)
+
+**1.java.lang.annotation.Retention**
+
+```java
+package java.lang.annotation;
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.ANNOTATION_TYPE)
+public @interface Retention {
+    /**
+     * Returns the retention policy.
+     * @return the retention policy
+     */
+    RetentionPolicy value();
+}
+```
+
+
+
 
 
 

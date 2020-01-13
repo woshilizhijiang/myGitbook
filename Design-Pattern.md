@@ -126,7 +126,80 @@ proxy2.upgrade();
 
 #### 学习的契机：
 
-​		枚举单例，java反射后构造实例依然只有一个实例。 引发对单例模式再度深入学习。
+​		枚举单例，java反射报错无法实例化。 引申对单例模式再度深入学习。
+​	问题：
+
+```java
+package com.pattern.singleton.enumType;
+public enum Enumsingleton {
+    INSTANCE;
+    public Enumsingleton getInstance(){
+        return INSTANCE;
+    }
+}
+
+package com.pattern.singleton;
+
+import com.pattern.singleton.enumType.Enumsingleton;
+
+import java.lang.reflect.Constructor;
+
+public class SingletonClient {
+
+    public static void main(String[] args) throws Exception{
+        Constructor<Enumsingleton> constructor1 = Enumsingleton.class.getDeclaredConstructor();
+        constructor1.setAccessible(true);
+        Enumsingleton e3 = constructor1.newInstance();
+
+        /**
+         * Exception in thread "main" java.lang.NoSuchMethodException: com.pattern.singleton.enumType.Enumsingleton.<init>()
+         * 	at java.lang.Class.getConstructor0(Class.java:3082)
+         * 	at java.lang.Class.getDeclaredConstructor(Class.java:2178)
+         * 	at com.pattern.singleton.Singleton.main(Singleton.java:34)
+         */
+        System.out.println(e3);
+    }
+}
+
+
+
+   /*错误原因java.lang.reflect.Constructor*/
+    @CallerSensitive
+    public T newInstance(Object ... initargs)
+        throws InstantiationException, IllegalAccessException,
+               IllegalArgumentException, InvocationTargetException
+    {
+        if (!override) {
+            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
+                Class<?> caller = Reflection.getCallerClass();
+                checkAccess(caller, clazz, null, modifiers);
+            }
+        }
+        //枚举报错原因开始
+        if ((clazz.getModifiers() & Modifier.ENUM) != 0)
+            throw new IllegalArgumentException("Cannot reflectively create enum objects");
+	
+        ConstructorAccessor ca = constructorAccessor;   // read volatile
+        if (ca == null) {
+            ca = acquireConstructorAccessor();
+        }
+        @SuppressWarnings("unchecked")
+        T inst = (T) ca.newInstance(initargs);
+        return inst;
+    }
+
+
+
+```
+
+```反射异常
+反射构造器调用getDeclaredConstructor()方法时，枚举生成如下：
+private com.pattern.singleton.enumType.Enumsingleton(java.lang.String,int)
+
+
+```
+
+
 
 #### 定义：
 
@@ -134,15 +207,25 @@ proxy2.upgrade();
 
 #### 组成：
 
+​		单例类：
+​		懒汉式单例：（第一次）使用加载或者叫运行时加载。
 
+​					枚举类型单例：java反射无法创建实例
+
+​		饿汉式单例：系统初始化时加载。
+
+​		
 
 #### 优点：
 
-
+1. 减少内存开销，避免频繁创建、销毁对象的消耗。
+2. 减少系统性能开销，
 
 #### 缺点：
 
-
+1. 没有接口类，不易扩展
+2. 对测试不利
+3. 与单一性原则相违背
 
 #### 场景：
 
