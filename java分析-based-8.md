@@ -69,6 +69,117 @@ public @interface Retention {
 
 
 
+## lambda表达式
+
+```用法
+* 用lambda表达式实现Runnable
+* lambda表达式替换匿名类
+*
+* lambda语法：
+* (params) -> expression
+* (params) -> statement
+* (params) -> {statements}
+```
+
+### 5种类用法
+
+- lambda使用foreach
+
+  ```java
+  List<String> features = Arrays.asList("Lambdas", "Default Method", "Stream API", "Date and Time API");	
+  	//方法一
+  features.forEach((n)->System.out.print.out(n))
+    
+    //方法二
+    // 使用Java 8的方法引用更方便，方法引用由::双冒号操作符标示，
+    // 看起来像C++的作用域解析运算符
+   features.forEach(System.out::println);
+  
+  //        for (String feature : features) {
+  //            System.out.println(feature);
+  //        }
+  ```
+
+- lambda实现Runnable
+
+  ```java
+          new Thread(new Runnable() {
+              @Override
+              public void run() {
+                  System.out.println(Thread.currentThread().getName() + " : Before Java8, too much code for too little to do");
+              }
+          },"Thread1").start();
+  
+  
+  
+  new Thread(()->System.out.print.out(Thread.currentThread().getName() + " : In Java8, Lamda expression rocks!!"),
+                  "Thread2")).start();
+  ```
+
+- lambda表达式和 函数式编程接口Predicate  :jdk8 java.util.funtion
+
+```java
+List<String> languages = Arrays.asList("Java", "Scala", "C++", "Haskell", "Lisp");
+System.out.println("Languages which starts with J :");
+filter(languages, (str) -> ((String)str).startsWith("J") );
+
+System.out.println("Print all languages :");
+filter(languages, (str)->true);
+
+System.out.println("Print null :");
+filter(languages, (str)->false);
+
+System.out.println("Print language whose length greater than 4:");
+filter(languages, (str)->((String)str).length() > 4);
+
+public static void filter(List<String> names, Predicate condition){
+        names.forEach((name) -> {
+            if (condition.test(name)){
+                System.out.println(name + " ");
+            }
+        });
+}
+```
+
+- JButton使用
+
+```java
+private void lambdaTrans(){
+        JButton show = new JButton("Show");
+//        show.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                System.out.println("Event handling without lambda expression is boring");
+//            }
+//        });
+
+        show.addActionListener((e) -> {
+            System.out.println("Light, Camera, Action !! Lambda expressions Rocks");
+        });
+
+    }
+```
+
+- lambda对象比较
+
+```java
+private void lambdaComparator(){
+        Comparator<Apple> byWeight = new Comparator<Apple>() {
+            @Override
+            public int compare(Apple a1, Apple a2) {
+
+                return a1.getWeight().compareTo(a2.getWeight());
+            }
+        };
+
+        //Lambda
+        Comparator<Apple> byWeightLambda = (Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight());
+
+        System.out.println(byWeight);
+
+    }
+```
+
 
 
 ## 并发线程
