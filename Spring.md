@@ -66,7 +66,7 @@ public interface BeanFactory {
 
 核心类：
 
-#### org.springframework.beans.factory.support.DefaultListableBeanFactory
+#### DefaultListableBeanFactory
 
 DefalutListableBeanFactory 为整个bean加载核心，是Spring注册及加载bean的默认实现
 
@@ -84,19 +84,20 @@ org.springframework.core.SimpleAliasRegistry ： 主要使用map作为alias的�
 
 。
 
-。
-
-
-
 org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 
 
 
+#### spring容器的基础XmlBeanFactory
+
+##### 配置文件封装
+
+Spring加载文件抽象类Resource：UML图如下：
 
 
+![ClassPathResource](/Users/lzj11/Documents/ClassPathResource.png)
 
-
-
+##### 加载Bean
 
 
 
@@ -105,6 +106,8 @@ org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 
 
 ### springboot分析
+
+
 
 #### spring boot-ssm
 
@@ -115,4 +118,8 @@ org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 
 
 ### springcloud分析
+
+
+
+
 
