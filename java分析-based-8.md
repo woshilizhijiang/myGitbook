@@ -182,6 +182,164 @@ private void lambdaComparator(){
 
 
 
+### lambda进化2.0
+
+#### 两种方式对比
+
+- 匿名内部类
+- lambda函数编程
+  **@FunctionalInterface作用就是标识一个接口为函数式接口**
+
+#### lambda语法
+
+多参数
+
+   （1）. lambda表达式的基本格式为(x1,x2)->{表达式...};
+
+   （2）. 在上式中，lambda表达式带有两个参数，此时参数类型可以省略，但两边的括号不能省略
+
+   （3）. 如果表达式只有一行，那么表达式两边的花括号可以省略
+
+无参数
+	   ( )->{....表达式....}
+
+   （1）.参数的括号不能省略，
+
+   （2）.其他语法同多参数
+
+```java
+new Thread(() -> {
+  //Runnable的run方法操作内容
+  
+}).start();
+```
+
+一个参数
+
+   （1）.可以省略参数的括号和类型
+
+   （2）.其他语法同多参数
+
+#### jdk提供的函数式接口
+
+包集中在：java.util.function
+
+***Function：提供任意一种类型的参数，返回另外一个任意类型返回值。 R apply(T t);***
+
+***Consumer：提供任意一种类型的参数，返回空值。 void accept(T t);***
+
+***Supplier：参数为空，得到任意一种类型的返回值。T get();***
+
+***Predicate：提供任意一种类型的参数，返回boolean返回值。boolean test(T t);***
+
+
+
+#### 方法引用：
+
+
+
+三种方式
+
+- 类::实例方法
+- 类::静态方法
+- 对象::实例方法
+
+```java
+System.out::println    ==   (x) -> System.out.println(x);  //对象::实例方法
+Math::pow              ==   (x,y) -> Math.pow(x,y) //类::静态方法
+```
+
+#### 自由变量的作用范围
+
+```java
+/**
+com.java8.lambda.base.constructor.ConstructorDemo@1789e283
+lambda express run...
+com.java8.lambda.base.constructor.ConstructorDemo$1@4cee664c
+anony function run...
+说明
+lambda的this是指包含lambda表达式的类
+匿名内部类的this；表示匿名内部类本身
+*/
+public static void main(String[] args) {
+        new ConstructorDemo().doWork1();
+        new ConstructorDemo().doWork2();
+    }
+
+    public void doWork1(){
+        Runnable runnable = ()->{
+            System.out.println(this.toString());
+            System.out.println("lambda express run...");
+        };
+        new Thread(runnable).start();
+    }
+
+    public void doWork2(){
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(this.toString());
+                System.out.println("anony function run...");
+            }
+        };
+        new Thread(runnable).start();
+    }
+```
+
+
+
+#### 接口的静态方法和默认方法
+
+以java.util.Comparator为示例
+
+接口中引入默认方法设计到一个问题
+
+（1）接口中的默认方法和父类中方法的冲突问题
+
+（2）接口之间引用的冲突问题
+
+对于第一个冲突，**java8规定类中的方法优先级要高于接口中的默认方法**，所以接口中默认方法复写Object类中的方法是没有意义的，因为所有的接口都默认继承自Object类使得默认方法一定会被覆盖。
+
+对于第二个冲突，**java8强制要求子类必须复写接口中冲突的方法**
+
+
+
+
+
+### Stream分析
+
+位置java.util.stream.Stream
+
+#### Stream特性
+
+**1.stream不存储数据**
+
+**2.stream不改变源数据**
+
+**3.stream的延迟执行特性**
+
+
+
+**5.原始类型流**
+
+在数据量比较大的情况下，将基本数据类型（int,double...）包装成相应对象流的做法是低效的，因此，我们也可以直接将数据初始化为原始类型流，在原始类型流上的操作与对象流类似，我们只需要记住两点
+
+1.原始类型流的初始化
+
+2.原始类型流与流对象的转换
+
+**6.并行流**
+
+可以将普通顺序执行的流转变为并行流，只需要调用顺序流的parallel() 方法即可，如Stream.iterate(1, x -> x + 1).limit(10).parallel()。
+
+**1） 并行流的执行顺序**
+
+我们调用peek方法来瞧瞧并行流和串行流的执行顺序，peek方法顾名思义，就是偷窥流内的数据，peek方法声明为Stream<T> peek(Consumer<? super T> action);加入打印程序可以观察到通过流内数据
+
+
+
+
+
 ## 并发线程
 
 ### 1.ThreadPoolExecutor线程池基类
