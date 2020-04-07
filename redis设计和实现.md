@@ -45,3 +45,43 @@ struct sdshdr{
 SDS可存储音频，视频，文件以二进制的形式
 C字符串只能存文件形式
 
+
+
+## 链表
+
+### redis内部应用场景
+
+- 列表键、发布与订阅、慢查询、监控 底层实现为链表
+
+### 链表结构
+
+adlist.h/list
+
+```c
+typedef struct list{
+  listNode *head;
+  listNode *tail;
+  unsigned long len;
+  void *(*dup)(void *ptr);
+  void *(*free)(void *ptr);
+  void *(*match)(void *ptr, void *key);
+}
+```
+
+**链表特性：**
+
+双端：
+
+无环：
+
+带表头指针和表尾指针：
+
+带链表长度计数器：
+
+多态：
+
+
+
+
+
+## 字典
