@@ -481,3 +481,45 @@ monitor机制；
 
 
 
+## 多线程
+
+### 1.创建线程的两种方式
+
+
+
+### 2.启动线程
+
+
+
+### 3.停止线程
+
+#### Thread方法分析
+
+线程内抛异常出问题的原因：
+Thread.currentThread().isInterrupted()不生效原因是sleep抛出InterruptedException
+
+if any thread has interrupted the current thread. **The  <i>interrupted status</i> of the current thread is  cleared when this exception is thrown**.
+
+阻塞状态被清除
+
+```java
+/**
+     * Causes the currently executing thread to sleep (temporarily cease
+     * execution) for the specified number of milliseconds, subject to
+     * the precision and accuracy of system timers and schedulers. The thread
+     * does not lose ownership of any monitors.
+     *
+     * @param  millis
+     *         the length of time to sleep in milliseconds
+     *
+     * @throws  IllegalArgumentException
+     *          if the value of {@code millis} is negative
+     *
+     * @throws  InterruptedException
+     *          if any thread has interrupted the current thread. The
+     *          <i>interrupted status</i> of the current thread is
+     *          cleared when this exception is thrown.
+     */
+    public static native void sleep(long millis) throws InterruptedException;
+```
+
