@@ -72,8 +72,6 @@ DefalutListableBeanFactory 为整个bean加载核心，是Spring注册及加载b
 
 
 
-![DefaultListableBeanFactory](/Users/lzj11/Documents/DefaultListableBeanFactory.png)
-
 
 
 
@@ -95,7 +93,7 @@ org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 Spring加载文件抽象类Resource：UML图如下：
 
 
-![ClassPathResource](/Users/lzj11/Documents/ClassPathResource.png)
+
 
 ##### 加载Bean
 
