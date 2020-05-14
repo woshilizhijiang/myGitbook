@@ -6,9 +6,9 @@
 
 
 
-### spring源码分析
+### 一、spring源码分析
 
-#### BeanFactory：
+#### 1.BeanFactory
 
 提供IOC和依赖注入
 
@@ -66,7 +66,7 @@ public interface BeanFactory {
 
 核心类：
 
-#### DefaultListableBeanFactory
+#### 2.DefaultListableBeanFactory
 
 DefalutListableBeanFactory 为整个bean加载核心，是Spring注册及加载bean的默认实现
 
@@ -86,7 +86,7 @@ org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 
 
 
-#### spring容器的基础XmlBeanFactory
+#### 3.spring容器的基础XmlBeanFactory
 
 ##### 配置文件封装
 
@@ -99,7 +99,30 @@ Spring加载文件抽象类Resource：UML图如下：
 
 
 
+#### 4.spring循环依赖问题
 
+**1.构造器参数循环依赖**
+
+表示通过构造器注入构成的循环依赖，此依赖是无法解决的，只能抛出**BeanCurrentlyIn CreationException**异常表示循环依赖。
+
+**2.setter方式单例，默认方法**
+bean实例化过程
+
+![image-20200512153151778](/Users/lzj11/Library/Application%20Support/typora-user-images/image-20200512153151778.png)
+
+
+
+**3.setter方式原型，prototype**
+
+对于"prototype"作用域bean，Spring容器无法完成依赖注入，因为Spring容器不进行缓存"prototype"作用域的bean，因此无法提前暴露一个创建中的bean。
+
+Caused by: org.springframework.beans.factory.BeanCurrentlyInCreationException: 
+  Error creating bean with name 'a': Requested bean is currently in creation: Is there an unresolvable circular reference? 
+
+**为什么原型模式就报错了呢 ？**
+
+对于“prototype”作用域Bean，Spring容器无法完成依赖注入，因为“prototype”作用域的Bean，Spring容
+器不进行缓存，因此无法提前暴露一个创建中的Bean。
 
 
 
