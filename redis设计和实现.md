@@ -85,3 +85,33 @@ typedef struct list{
 
 
 ## 字典
+
+
+
+
+
+
+
+
+
+# C源码分析
+
+### 1.源码地址
+
+```markdown
+https://github.com/antirez/redis/tree/6.0
+```
+
+### 2.redis 6功能简图
+
+![redis多线程架构模型](D:\developer\visualworkspace\myGitbook\截图\redis多线程架构模型.png)
+
+### 3.多线程redis设置
+
+```shell
+#同样修改redis.conf配置文件：io-threads 4
+#官方有一个建议：4核的机器建议设置为2或3个线程，8核的建议设置为6个线程，线程数一定要小于机器核数。 （超过8个基本没什么意义）
+```
+
+
+
