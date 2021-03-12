@@ -59,7 +59,7 @@ IOC(inversion of control)，或者叫DI（Dependency injection）依赖注入。
       扩展 ResourceLoader ，可以用来加载多种 Resource ，可以灵活访问不同的资源。
       对 Web 应用的支持。
 
-   7.  
+      #### 二、IoC之Spring统一资源加载策略
 
 
 
