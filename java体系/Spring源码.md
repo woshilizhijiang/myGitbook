@@ -179,7 +179,7 @@ public void refresh() throws BeansException, IllegalStateException {
 
 ```java
 //spring 三级缓存 建议使用setter解决循环依赖问题 
-//一二三级缓存Map实现
+//一二三级缓存Map实现 
 //org.springframework.beans.factory.support.DefaultSingletonBeanRegistry 存放三个依赖位置
 class DefaultSingletonBeanRegistry{
     /** Cache of singleton objects: bean name to bean instance. */
