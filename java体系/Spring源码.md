@@ -19,7 +19,7 @@ IOC(inversion of control)，或者叫DI（Dependency injection）依赖注入。
 
 
 
-![1](..\截图\IOC.png)
+<img src="..\截图\IOC.png" alt="1" style="zoom: 50%;" />
 
 1. ##### 注入形式
 
@@ -64,4 +64,136 @@ IOC(inversion of control)，或者叫DI（Dependency injection）依赖注入。
 
 
 
+
+### 程序加载分析
+
+### 1.源码输入核心
+
+- AbstractApplicationContext图谱
+  ![](..\截图\ApplicationContext.png)
+
+  Spring加载过程
+  <img src="..\截图\Spring加载工程2.jpg"  />
+
+  <img src="..\截图\Spring加载工程.jpg"  />
+
+```java
+ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("GenericParameterMatchingTests-context.xml");
+counterAspect = (CounterAspect) ctx.getBean("counterAspect");
+GenericInterface<String> testBean = (GenericInterface<String>) ctx.getBean("testBean");
+testBean.save("tt");
+```
+
+- ClassPathXmlApplicationContext 执行了配置文件加载到Resource中的动作
+- org.springframework.context.support.AbstractApplicationContext
+      **refresh方法**    
+  - DefaultListableBeanFactory通过反射
+
+```java
+/*
+*返回静态指定的ApplicationListener列表。
+*/
+public void refresh() throws BeansException, IllegalStateException {
+		synchronized (this.startupShutdownMonitor) {
+			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
+
+			// Prepare this context for refreshing.
+            // 1.准备上下文以供刷新，包含启动日期、活动标志、属性源执行初始化
+			prepareRefresh();
+
+			// Tell the subclass to refresh the internal bean factory.
+			// 2.告诉子类刷新内部bean工厂，
+            // 提供外部做扩展，相当于主流程过滤器
+            // 判断有bean工厂 DefaultListableBeanFactory
+            // AbstractRefreshableApplicationContext volatile DefaultListableBeanFactory beanFactory;
+			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+
+			// Prepare the bean factory for use in this context.
+            // 3.准备使用上下文bean工厂基础信息
+            // 配置工厂的标准上下文特征，例如上下文的类加载器和后处理器。（post-processors）
+			prepareBeanFactory(beanFactory);
+
+			try {
+				// Allows post-processing of the bean factory in context subclasses.
+                // 4.允许在上下文子类中对bean工厂进行后处理；所有的bean已被加载，但未初始化
+				postProcessBeanFactory(beanFactory);
+
+				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
+				// Invoke factory processors registered as beans in the context.
+                // 5.实例化并调用bean工厂
+				invokeBeanFactoryPostProcessors(beanFactory);
+
+				// Register bean processors that intercept bean creation.
+                // 6.注册bean处理器，拦截创建的bean做相应处理；保障bean处理器的顺序。（ArrayList,Comparator保障顺序）
+				registerBeanPostProcessors(beanFactory);
+				beanPostProcess.end();
+
+				// Initialize message source for this context.
+                // 7.初始化上下文消息；下文未定义，使用父类级别。
+				initMessageSource();
+
+				// Initialize event multicaster for this context.
+                // 8.为上下文初始化时间 多星；
+				initApplicationEventMulticaster();
+
+				// Initialize other special beans in specific context subclasses.
+                // 9.在指定的上下文子类中初始化指定的beans，（默认为空）
+				onRefresh();
+
+				// Check for listener beans and register them.
+                // 10.检查监听beans并且注册他们。即设置监听器Listeners
+				registerListeners();
+
+				// Instantiate all remaining (non-lazy-init) singletons.
+                // 11.实例化所有剩余的（非lazy init）单例。
+				finishBeanFactoryInitialization(beanFactory);
+
+				// Last step: publish corresponding event.
+                // 12.最后一步：发布相应事件
+				finishRefresh();
+			} catch (BeansException ex) {
+				if (logger.isWarnEnabled()) {
+					logger.warn("Exception encountered during context initialization - " +
+							"cancelling refresh attempt: " + ex);
+				}
+
+				// Destroy already created singletons to avoid dangling resources.
+				destroyBeans();
+
+				// Reset 'active' flag.
+				cancelRefresh(ex);
+
+				// Propagate exception to caller.
+				throw ex;
+			}
+
+			finally {
+				// Reset common introspection caches in Spring's core, since we
+				// might not ever need metadata for singleton beans anymore...
+				resetCommonCaches();
+				contextRefresh.end();
+			}
+		}
+	}
+```
+
+```java
+//spring 三级缓存 建议使用setter解决循环依赖问题 
+//一二三级缓存Map实现
+//org.springframework.beans.factory.support.DefaultSingletonBeanRegistry 存放三个依赖位置
+class DefaultSingletonBeanRegistry{
+    /** Cache of singleton objects: bean name to bean instance. */
+    //一级缓存 存放完整可用的bean对象
+	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
+
+	/** Cache of singleton factories: bean name to ObjectFactory. */
+    //三级缓存  存放创建中bean及其匿名内部类
+	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
+
+	/** Cache of early singleton objects: bean name to bean instance. */
+    //二级缓存  存储创建中实例，AOP代理也在这一层
+	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
+}
+    
+```
 
