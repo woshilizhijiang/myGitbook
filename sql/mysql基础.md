@@ -14,7 +14,11 @@ select version(); --苏宁 5.7.19-17-log
 
 ```
 
+#### 面试指南
 
+1. **MySql读写IO的操作过程** 
+   https://zhuanlan.zhihu.com/p/89051646
+2. 
 
 
 
@@ -348,17 +352,127 @@ InnoDB索引支持一下几种常见的索引:
 ##### innodb存储引擎中的锁
 
 - 锁的类型
-  - 共享锁（S Lock），允许事务读一行数据
-  - 排他锁（X Lock），允许事务删除或更新一行数据
+  - 共享锁（S Lock），**允许事务读一行数据**
+  - 排他锁（X Lock），**允许事务删除或更新一行数据**
   - ![image-20210224211541356](C:\Users\20013649\AppData\Roaming\Typora\typora-user-images\image-20210224211541356.png)
     X、S锁都为行锁
-  - 
+  - **innodb支持意向锁**表示 表或行锁同时支持，
+    - 意向共享锁
+    - 意向排他锁
+- 一致性非锁定读
+  - MVCC(Mutil Version Concurrency Control)多版本并发控制
+  - **innodb通过多版本控制的方式来读取当前执行时间数据库中行的数据，即如果读取行正在执行delete或update，读操作不会去等待行锁释放**
+  - innodb使用非锁定的一致性读
+    - Read commited事务隔离级别下，对于快照数据，总是读取被锁定的最新一份snapshot数据
+    - repeatable read事务隔离级别下，对于快照数据，事务开始时的行数据版本
+- 一致性锁定读
+  - mysql提供两种一致性锁定读
+    - select ... for update  :加X锁
+    - select ... lock in share mode ：加S锁
+- 自增长与锁
+  - 主键自增长加锁，保证高并发下安全。innodb行锁考虑插入问题
+  - MYISAM是表锁，粗暴简单无效考虑插入问题。
+- 外键与锁
+  - **外键列innodb自动加索引，oracle不自动加。**
+
+##### 锁的算法
+
+- 行锁的3种算法（Innodb）
+  - Record Lock：单个行记录上的锁（主键隐式的进行锁定）
+  - Gap Lock：间隙锁，锁定一个范围，但不包含记录本身
+  - Next-Key Lock： Gap Lock + Record Lock，锁定一个范围，并且锁定记录本身。（innodb行锁采用这种算法）
+
+- 解决phantom problem（幻读）
+  - **innodb repeatable read采用Next-Key Lock算法阻止幻读，oracle则需要serializable事务隔离级别**
+
+##### 锁问题
+
+锁只会带来三种问题
+
+- 脏读：不同事务下，当前事务可以读到另外事务未提交的数据，简单说就是可以读到脏数据。
+  - 绝大多数数据库是read committed，innodb是read repeatable
+  - 特殊场景read uncommited会出现脏读
+- 不可重复读
+  - 两个事务读取到不一样的已提交数据，违反数据库事务一致性的要求。
+- 丢失更新
+  - 一事务更新被另一个事务更新覆盖，导致数据不一致。
+  - 当前数据库隔离级别下，理论意义上都不会导致丢失更新。
+
+##### 阻塞
+
+- 竞争同一个资源导致阻塞。innodb_lock_wait_timeout（默认50s）控制等待的时间。
+
+##### 死锁
+
+- **两个或以上事务执行过程中，争夺锁资源而造成一种相互等待的现象。**
+  - **解决办法：1.将任何等待转化为回滚，并且事务重新开始**
+  - **解决办法：2.超时机制**
+
+##### 锁升级
+
+- innodb不存在锁升级问题
+- sql server有锁升级问题，行锁变页锁
 
 #### 7章 事务
 
-- 
+##### 认识事务
 
+- 分类
+  - 扁平：begin work， commit work，rollback work 
+  - 带有保存点的扁平：savepoint 不持久化
+  - 链：持久化
+  - 嵌套
+  - 分布式
 
+##### 事务的实现
+
+ACID
+
+A、D通过redo log ，C通过undo log
+
+##### 分布式事务
+
+- mysql数据库分布式事务
+  - ![](..\截图\分布式事务模型.png)
+  - 允许多个独立的事务资源（）
+  - XA（eXtended Architecture）事务
+  - innodb使用分布式事务，事务隔离级别必须是serializable，
+  - 2阶段提交(two-phase commit)
+
+##### 不好的事务习惯
+
+- 在循环中提交事务
+- 使用自动提交
+- 使用自动回滚
+
+##### 长事务
+
+执行时间较长的事务。场景银行账号过亿更新，需要1小时或者4、5小时。
+
+- 对于长事务问题，将其转化为多个小批量的事务处理。一亿用户 拆分为10个用户级别
+
+### 8.备份和恢复
+
+mysqldump、ibbackup、replication。第三方工具 xtrabacup、LVM快照备份等。
+
+##### 8.1备份与恢复概述
+
+备份方式
+
+- hot backup 热备份
+- cold backup 冷备份
+- warm backup 温备份：全局锁，保证数据一致性
+
+备份后文件内容：
+
+- 逻辑备份
+- 裸文件备份
+
+备份数据库内容来分
+
+- 完全备份
+- 增量备份
+- 日志备份
 
 
 
@@ -385,16 +499,71 @@ show engine  innodb status ;
 
 show variables like 'innodb_version'
 
-#### sql4种标准隔离
+#### sql4种标准事务隔离级别
 
 1. read uncommited：未提交可读取
-2. read commited：提交可读取
-3. reapatable：可重复度
+2. read commited：提交可读取(一般数据库默认)
+3. reapatable read：可重复读  **(mysql innodb默认)**
 4. serializable：可串行化
 
 #### 基础语句
 
+![](..\截图\explain2.png)
+
+![](..\截图\optimizer_trace.png)
+
 ```sql
+--1.between and 范围包含边界相当于 >= 和 <=
+
+--2.MySQL中大于小于，IN，OR，BETWEEN性能比较
+--2.1explain 性能展示相同
+explain
+select id from meta_host_fragment_monitor
+where valid = 1 and id between 80001 and 80004;
+
+
+
+select id from meta_host_fragment_monitor
+where valid = 1
+and id >= 80001 and id<= 80004;
+
+  “ranges”: [
+      “100 <= id <= 104″
+  ]
+
+select id from meta_host_fragment_monitor
+where valid = 1 and id in(80001 ,80002,80003,80004);
+“ranges”: [
+    “100 <= id <= 100″,
+    “101 <= id <= 101″,
+    “102 <= id <= 102″,
+    “103 <= id <= 103″,
+    “104 <= id <= 104″
+]
+
+select id from meta_host_fragment_monitor
+where valid = 1 and id=80001 or id = 80002 or id = 80003 or id = 80004;
+“ranges”: [
+    “100 <= id <= 100″,
+    “101 <= id <= 101″,
+    “102 <= id <= 102″,
+    “103 <= id <= 103″,
+    “104 <= id <= 104″
+]
+
+
+--2.2 OPTIMIZER_TRACE
+show variables like '%optimizer_trace%';
+--1.打开optimizer trace功能 (默认情况下它是关闭的): ,one_line=on可选
+SET optimizer_trace="enabled=on,one_line=on"
+--2.这里输入你自己的查询语句
+SELECT ...;
+--3.从OPTIMIZER_TRACE表中查看上一个查询的优化过程
+SELECT * FROM information_schema.OPTIMIZER_TRACE;
+--4.可能你还要观察其他语句执行的优化过程，重复上边的第2、3步
+...
+--5.当你停止查看语句的优化过程时，把optimizer trace功能关闭
+SET optimizer_trace="enabled=off,one_line=off";
 
 ```
 
@@ -430,24 +599,67 @@ SELECT * FROM table WHERE id IN(10000, 100000, 1000000...);
 
 #### 2.explain
 
+![](..\截图\explain解释1.png)
+
 ```markdown
+1. id
+SELECT识别符。这是SELECT查询序列号。这个不重要,查询序号即为sql语句执行的顺序，看下面这条sql
 
+2. select_type
+select类型，它有以下几种值
+2.1 simple 它表示简单的select,没有union和子查询
+2.2 primary 最外面的select,在有子查询的语句中，最外面的select查询就是primary,
+2.3 union union语句的第二个或者说是后面那一个.现执行一条语句
+2.4 DEPENDENT UNION：一般是子查询中的第二个select语句（取决于外查询，mysql内部也有些优化）
+2.5 UNION RESULT：union的结果
+2.6 SUBQUERY：子查询中的第一个select
+2.7 DEPENDENT SUBQUERY：子查询中第一个select，取决于外查询（在mysql中会有些优化，有些dependent会直接优化成simple）
+2.8 DERIVED：派生表的select（from子句的子查询）奇怪的是在5.7的版本中竟然只有一个SIMPLE
 
+3. table
+输出的行所用的表，这个参数显而易见，容易理解。
+
+4. type
 常用的类型有： ALL、index、range、 ref、eq_ref、const、system、NULL（从左到右，性能从差到好）
-
 ALL：Full Table Scan， MySQL将遍历全表以找到匹配的行
-
 index: Full Index Scan，index与ALL区别为index类型只遍历索引树
-
-range:只检索给定范围的行，使用一个索引来选择行
-
-ref: 表示上述表的连接匹配条件，即哪些列或常量被用于查找索引列上的值
-
+range:只检索给定范围的行，使用一个索引来选择行，一般出现在>、<、in、between
+ref: 表示上述表的连接匹配条件，即哪些列或常量被用于查找索引列上的值；非唯一索引
 eq_ref: 类似ref，区别就在使用的索引是唯一索引，对于每个索引键值，表中只有一条记录匹配，简单来说，就是多表连接中使用primary key或者 unique key作为关联条件
-
-const、system: 当MySQL对查询某部分进行优化，并转换为一个常量时，使用这些类型访问。如将主键置于where列表中，MySQL就能将该查询转换为一个常量，system是const类型的特例，当查询的表只有一行的情况下，使用system
-
+const、system: 当MySQL对查询某部分进行优化，并转换为一个常量时，使用这些类型访问。
+如将主键置于where列表中，MySQL就能将该查询转换为一个常量，
+system是const类型的特例，当查询的表只有一行的情况下，使用system
 NULL: MySQL在优化过程中分解语句，执行时甚至不用访问表或索引，例如从一个索引列里选取最小值可以通过单独索引查找完成。
+
+5. possible_keys
+显示可能应用在这张表中的索引，但不一定被查询实际使用
+
+6. key
+实际使用的索引。
+
+7. key_len
+表示索引中使用的字节数，可通过该列计算查询中使用的索引的长度。一般来说，索引长度越长表示精度越高，效率偏低；长度越短，效率高，但精度就偏低。并不是真正使用索引的长度，是个预估值。
+
+8. ref
+表示哪一列被使用了，常数表示这一列等于某个常数。
+
+9. rows
+大致找到所需记录需要读取的行数。
+
+10. filter
+表示选取的行和读取的行的百分比，100表示选取了100%，80表示读取了80%。
+
+11. extra
+一些重要的额外信息
+
+Using filesort：使用外部的索引排序，而不是按照表内的索引顺序进行读取。（一般需要优化）
+Using temporary：使用了临时表保存中间结果。常见于排序order by和分组查询group by（最好优化）
+Using index：表示select语句中使用了覆盖索引，直接冲索引中取值，而不需要回行（从磁盘中取数据）
+Using where：使用了where过滤
+Using index condition：5.6之后新增的，表示查询的列有非索引的列，先判断索引的条件，以减少磁盘的IO
+Using join buffer：使用了连接缓存
+impossible where：where子句的值总是false
+还有一些，基本上很少遇到，就不作说明了。
 ```
 
 

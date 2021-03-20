@@ -1,13 +1,13 @@
 # Redis设计与实现分析总结
 
-## 简短动态字符串（simple dynamic string --SDS）
+### 简短动态字符串（simple dynamic string --SDS）
 
-### redis内部应用场景
+#### redis内部应用场景
 
 - AOP模块中AOF缓存区
 - 客户端状态中输入缓冲区
 
-### SDS结构：
+#### SDS结构：
 
 **C字符串结尾默认空字符串'\0'；一个字节**
 
@@ -21,11 +21,11 @@ struct sdshdr{
 }
 ```
 
-### SDS空间非配优化策略
+#### SDS空间非配优化策略
 
 空间预分配和惰性空间释放
 
-#### 空间预分配
+##### 空间预分配
 
 优化SDS字符串增长操作
 
@@ -34,26 +34,26 @@ struct sdshdr{
 - len > 1MB；程序增长大于free 时，分配free的空间为固定1M；SDS实际长度 len+1MB+1byte;
 
 
-#### 惰性空间释放
+##### 惰性空间释放
 
 优化SDS字符串缩短操作
 
 **SDS删除操作，会将len释放到free，不会缩短预分配长度；即实际长度不变。**
 
-### 二进制安全
+#### 二进制安全
 
 SDS可存储音频，视频，文件以二进制的形式
 C字符串只能存文件形式
 
 
 
-## 链表
+### 链表
 
-### redis内部应用场景
+#### redis内部应用场景
 
 - 列表键、发布与订阅、慢查询、监控 底层实现为链表
 
-### 链表结构
+##### 链表结构
 
 adlist.h/list
 
@@ -84,13 +84,91 @@ typedef struct list{
 
 
 
-## 字典
+### 字典
 
 
 
+### 13章 客户端
 
 
 
+### 14章 服务端
+
+serverCron函数默认每隔100ms执行一次，负责管理服务端的资源。
+
+```c
+//为什么server.c是 1ms 版本redis6源码
+initServer::
+/* Create the timer callback, this is our way to process many background
+     * operations incrementally, like clients timeout, eviction of unaccessed
+     * expired keys and so forth. */
+if (aeCreateTimeEvent(server.el, 1, serverCron, NULL, NULL) == AE_ERR) {
+    serverPanic("Can't create event loop timers.");
+    exit(1);
+}
+
+//ae.c
+long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
+        aeTimeProc *proc, void *clientData,
+        aeEventFinalizerProc *finalizerProc)
+{
+    long long id = eventLoop->timeEventNextId++;
+    aeTimeEvent *te;
+
+    te = zmalloc(sizeof(*te));
+    if (te == NULL) return AE_ERR;
+    te->id = id;
+    aeAddMillisecondsToNow(milliseconds,&te->when_sec,&te->when_ms);
+    te->timeProc = proc;
+    te->finalizerProc = finalizerProc;
+    te->clientData = clientData;
+    te->prev = NULL;
+    te->next = eventLoop->timeEventHead;
+    te->refcount = 0;
+    if (te->next)
+        te->next->prev = te;
+    eventLoop->timeEventHead = te;
+    return id;
+}
+```
+
+
+
+### 19.事务
+
+mutil、exec、watch、unwatch、discard
+
+- 事务的实现：三阶段
+  - 事务开始
+  - 命令入队
+  - 事务执行
+
+
+
+### 20.Lua脚本
+
+
+
+```shell
+#对lua脚本求值
+10.47.188.57:0>eval "return 'hello world'" 0
+"hello world"
+10.47.188.57:0>eval "return 1+1" 0
+"2"
+#将脚本 script 添加到脚本缓存中，但并不立即执行这个脚本；返回给定 script 的 SHA1 校验和
+script load "return 2*2"
+"4475bfb5919b5ad16424cb50f74d4724ae833e72"
+#通过 EVALSHA 命令，可以使用脚本的 SHA1 校验和来调用这个脚本
+10.47.188.57:0>evalsha "4475bfb5919b5ad16424cb50f74d4724ae833e72" 0
+"4"
+#
+```
+
+
+
+### 21.排序
+
+SORT
 
 
 
