@@ -544,7 +544,7 @@ if any thread has interrupted the current thread. **The  <i>interrupted status</
 1. 方法概述
 2. wait, notify,notifyAll方法详解
 3. sleep方法详解
-4. join方法
+4. **join方法(main线程wait方法，Thread源码join(long millis))**
 5. yield方法
 6. currentThread引用
 7. start和run
@@ -629,6 +629,132 @@ sleep方法可以让线程进入WAITING状态，并且不占用CPU资源，但�
 
 
 
+#### 2.ThreadPoolTaskExecutor
+
+![](..\截图\ThreadPoolTaskExecutor执行流程.png)
+
+
+
+- 五种状态
+
+  ```java
+      private static final int RUNNING    = -1 << COUNT_BITS;
+      private static final int SHUTDOWN   =  0 << COUNT_BITS;
+      private static final int STOP       =  1 << COUNT_BITS;
+      private static final int TIDYING    =  2 << COUNT_BITS;
+      private static final int TERMINATED =  3 << COUNT_BITS;
+  ```
+
+  ![](..\截图\线程池生命周期.png)
+
+
+
+- 阻塞队列
+  ![](..\截图\ThreadPoolExecutor阻塞队列.png)
+
+
+
+
+
+
+
 
 
 ## NIO
+
+
+
+
+
+
+
+## GC回收机制
+
+### ZGC
+
+特点
+
+- 停顿时间不超过10ms
+- 停顿时间不会随着堆增大而增加
+- 支持8MB~4TB级别堆（未来16TB）
+
+#### GC之痛
+
+介绍实际业务中遇到的 GC 痛点，并分析 CMS 收集器和 G1 收集器停顿时间瓶颈；  
+
+
+
+### GC基础概念
+
+- GC包含三个概念
+
+Garbage Collection:垃圾收技术
+Garbage Collector:垃圾收集器
+Garbage Collecting:垃圾收集动作
+
+- Mutator：生成垃圾角色
+- TLAB（Thread local allocation buffer）
+  基于CAS独享线程可以优先分配Eden中一块内存。
+- Card Table
+  卡表：
+
+### JVM内存划分
+
+![](..\截图\java8内存结构.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

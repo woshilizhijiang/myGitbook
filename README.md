@@ -1,6 +1,16 @@
 # myGitbook
 技术学习规整
 
+### 付费源码
+
+```shell
+http://svip.iocoder.cn/
+
+yudaoyuanma/ydym1024
+```
+
+
+
 ### 2021 3月-4月 主攻
 
 #### 架构
