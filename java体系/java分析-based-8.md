@@ -1,6 +1,6 @@
 # jdk8经典分析
 
-## 基础源码
+## 基础
 
 ### 枚举详解（enum:java.lang.Enum）
 
@@ -340,9 +340,179 @@ public static void main(String[] args) {
 
 
 
-## 并发线程源码
+## java源码
 
-### 1.ThreadPoolExecutor线程池基类
+### 集合类
+
+#### 1.HashMap
+
+底层实现由“数组+链表”改为“数组+链表+红黑树”，架构图如下，当链表节点较少仍是**“数组+链表”**，当链表节点大于8转为**“数组+红黑树”**。(改图不准确，红黑树节点无数据必须以nil来填充)
+
+![](..\截图\HashMap架构图.png)
+
+```java
+//0.hash
+//(n - 1) & hash = x % 2^n
+//x mod 2^n = x & (2^n - 1)
+
+//1.get方法
+public V get(Object key) {
+    Node<K,V> e;
+    return (e = getNode(hash(key), key)) == null ? null : e.value;
+}
+final Node<K,V> getNode(int hash, Object key) {
+    Node<K,V>[] tab; Node<K,V> first, e; int n; K k;
+    //1.对table进行校验：table不为空 && table长度大于0 && 
+    // table索引位置(使用table.length - 1和hash值进行位与运算)的节点不为空
+    if ((tab = table) != null && (n = tab.length) > 0 &&
+        (first = tab[(n - 1) & hash]) != null) {
+        // 2.检查first节点的hash值和key是否和入参的一样，如果一样则first即为目标节点，直接返回first节点
+        if (first.hash == hash && // always check first node
+            ((k = first.key) == key || (key != null && key.equals(k))))
+            return first;
+        // 3.如果first不是目标节点，并且first的next节点不为空则继续遍历
+        if ((e = first.next) != null) {
+            // 4.如果是红黑树节点，则调用红黑树的查找目标节点方法getTreeNode
+            if (first instanceof TreeNode)
+                return ((TreeNode<K,V>)first).getTreeNode(hash, key);
+            // 5.执行链表节点的查找，向下遍历链表, 直至找到节点的key和入参的key相等时,返回该节点
+            do {
+                if (e.hash == hash &&
+                    ((k = e.key) == key || (key != null && key.equals(k))))
+                    return e;
+            } while ((e = e.next) != null);
+        }
+    }
+    // 6.找不到符合的返回空
+    return null;
+}
+
+//2.put方法
+public V put(K key, V value) {
+    return putVal(hash(key), key, value, false, true);
+}
+
+final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
+               boolean evict) {
+    Node<K,V>[] tab; Node<K,V> p; int n, i;
+    // 1.校验table是否为空或者length等于0，如果是则调用resize方法进行初始化
+    if ((tab = table) == null || (n = tab.length) == 0)
+        n = (tab = resize()).length;
+    // 2.通过hash值计算索引位置，将该索引位置的头节点赋值给p，如果p为空则直接在该索引位置新增一个节点即可
+    if ((p = tab[i = (n - 1) & hash]) == null)
+        tab[i] = newNode(hash, key, value, null);
+    else {
+        // table表该索引位置不为空，则进行查找
+        Node<K,V> e; K k;
+        // 3.判断p节点的key和hash值是否跟传入的相等，如果相等, 则p节点即为要查找的目标节点，将p节点赋值给e节点
+        if (p.hash == hash &&
+            ((k = p.key) == key || (key != null && key.equals(k))))
+            e = p;
+        // 4.判断p节点是否为TreeNode, 如果是则调用红黑树的putTreeVal方法查找目标节点
+        else if (p instanceof TreeNode)
+            e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
+        else {
+            // 5.走到这代表p节点为普通链表节点，则调用普通的链表方法进行查找，使用binCount统计链表的节点数
+            for (int binCount = 0; ; ++binCount) {
+                // 6.如果p的next节点为空时，则代表找不到目标节点，则新增一个节点并插入链表尾部
+                if ((e = p.next) == null) {
+                    p.next = newNode(hash, key, value, null);
+                    // 7.校验节点数是否超过8个，如果超过则调用treeifyBin方法将链表节点转为红黑树节点，
+                    // 减一是因为循环是从p节点的下一个节点开始的
+                    if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
+                        treeifyBin(tab, hash);
+                    break;
+                }
+                // 8.如果e节点存在hash值和key值都与传入的相同，则e节点即为目标节点，跳出循环
+                if (e.hash == hash &&
+                    ((k = e.key) == key || (key != null && key.equals(k))))
+                    break;
+                p = e;
+            }
+        }
+         // 9.如果e节点不为空，则代表目标节点存在，使用传入的value覆盖该节点的value，并返回oldValu
+        if (e != null) { // existing mapping for key
+            V oldValue = e.value;
+            if (!onlyIfAbsent || oldValue == null)
+                e.value = value;
+            afterNodeAccess(e);
+            return oldValue;
+        }
+    }
+    ++modCount;
+    // 10.如果插入节点后节点数超过阈值，则调用resize方法进行扩
+    if (++size > threshold)
+        resize();
+    afterNodeInsertion(evict);
+    return null;
+}
+
+//remove
+public V remove(Object key) {
+    Node<K,V> e;
+    return (e = removeNode(hash(key), key, null, false, true)) == null ?
+        null : e.value;
+}
+
+final Node<K,V> removeNode(int hash, Object key, Object value,
+                           boolean matchValue, boolean movable) {
+    Node<K,V>[] tab; Node<K,V> p; int n, index;
+    if ((tab = table) != null && (n = tab.length) > 0 &&
+        (p = tab[index = (n - 1) & hash]) != null) {
+        Node<K,V> node = null, e; K k; V v;
+        if (p.hash == hash &&
+            ((k = p.key) == key || (key != null && key.equals(k))))
+            node = p;
+        else if ((e = p.next) != null) {
+            if (p instanceof TreeNode)
+                node = ((TreeNode<K,V>)p).getTreeNode(hash, key);
+            else {
+                do {
+                    if (e.hash == hash &&
+                        ((k = e.key) == key ||
+                         (key != null && key.equals(k)))) {
+                        node = e;
+                        break;
+                    }
+                    p = e;
+                } while ((e = e.next) != null);
+            }
+        }
+        if (node != null && (!matchValue || (v = node.value) == value ||
+                             (value != null && value.equals(v)))) {
+            if (node instanceof TreeNode)
+                ((TreeNode<K,V>)node).removeTreeNode(this, tab, movable);
+            else if (node == p)
+                tab[index] = node.next;
+            else
+                p.next = node.next;
+            ++modCount;
+            --size;
+            afterNodeRemoval(node);
+            return node;
+        }
+    }
+    return null;
+}
+```
+
+##### 死循环问题
+
+resize导致的节点顺序错乱
+
+
+
+#### 2.ConcurrentHashMap
+
+jdk1.7采用分段；jdk1.8开始用“CAS+Synchronized”
+
+
+
+
+
+### 多线程
+
+#### 1.ThreadPoolExecutor线程池基类
 
 java.util.concurrent.ThreadPoolExecutor
 
@@ -352,7 +522,7 @@ java.util.concurrent.ThreadPoolExecutor
 
 
 
-### 2.AbstractQueuedSynchronizer多线程基类
+#### 2.AQS多线程基类
 
 java.util.concurrent.locks.AbstractQueuedSynchronizer
 
@@ -362,7 +532,7 @@ hasQueuedPredecessors
 
 
 
-### 3.ReentrantLock锁
+#### 3.ReentrantLock锁
 
 公平锁和非公平锁在 tryAcquire(int)是否有hasQueuedPredecessors()
 
