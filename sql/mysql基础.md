@@ -58,14 +58,14 @@ mysql区别与其他数据库的特点：**插件式存储引擎**
 
 mysql体系机构
 
-1. 连接池
+1. **连接池**
 2. 管理服务和工具组件
 3. sql接口组件
-4. 查询分析器
-5. 性能优化组件
-6. 缓存
-7. 插件式引擎
-8. 物理文件
+4. **查询分析器**
+5. **性能优化组件**
+6. **缓存**
+7. **插件式引擎**
+8. **物理文件**
 
 #### innodb简单叙述
 
@@ -73,7 +73,7 @@ mysql体系机构
 
 ibd文件
 
-- 表中数据存储：采用聚簇索引的方式，引申出非聚簇索引； innodb两大索引(clustered index 、non-clustered index)
+- 表中数据存储：**采用聚簇索引的方式，引申出非聚簇索引**； innodb两大索引(clustered index 、non-clustered index)
 
   clustered index 每张表的存储按照主键顺序存放，**如果没有指定primary key；自动生成6字节 rowid 作为主键**
 
@@ -120,7 +120,7 @@ ibd文件
 
 master thread线程优先级最高。由几个循环组成：主循环、后台循环、刷新循环、暂停循环。
 
-loop分两大部分操作：每秒钟和每10秒
+loop分两大部分操作：**每秒钟和每10秒**
 master thread潜在问题：
 对IO有限制，
 
@@ -137,7 +137,7 @@ master thread潜在问题：
 
 **自适应哈希索引**
 
-查找性能提升，理论上时间复杂度为O(1)
+**查找性能提升，理论上时间复杂度为O(1)**
 
 **2.5启动、关闭与恢复**
 
@@ -159,7 +159,7 @@ mysql数据库和innodb存储引擎表的各种类型文件
 - MYSQL表结构文件：用来存放mysql表结构定义文件
   
 - 存储引擎文件：存储引擎的各个文件类型
-  frm
+  **frm**
   **innodb存储引擎文件**
   表空间文件：初始化10Mb，ibdata1的文件 。.ibd结尾文件
 
@@ -262,7 +262,7 @@ InnoDB索引支持一下几种常见的索引:
 ##### B+树
 
 - 由B树和索引顺序访问方法演化而来
-- B+树定义:待补充......简短介绍,B+树为磁盘或者其他直接存取辅助设备设计的一种平衡查找树。
+- B+树定义:待补充......简短介绍,B+树**为磁盘或者其他直接存取辅助设备设计的一种平衡查找树**。
   ![image-20210222191559305](C:\Users\20013649\AppData\Roaming\Typora\typora-user-images\image-20210222191559305.png)
 
 - B+树的插入操作:插入后叶子节点中记录依然排序,插入B+树的三种情况
@@ -360,15 +360,15 @@ InnoDB索引支持一下几种常见的索引:
     - 意向共享锁
     - 意向排他锁
 - 一致性非锁定读
-  - MVCC(Mutil Version Concurrency Control)多版本并发控制
+  - **MVCC(Mutil Version Concurrency Control)多版本并发控制**
   - **innodb通过多版本控制的方式来读取当前执行时间数据库中行的数据，即如果读取行正在执行delete或update，读操作不会去等待行锁释放**
   - innodb使用非锁定的一致性读
     - Read commited事务隔离级别下，对于快照数据，总是读取被锁定的最新一份snapshot数据
     - repeatable read事务隔离级别下，对于快照数据，事务开始时的行数据版本
 - 一致性锁定读
   - mysql提供两种一致性锁定读
-    - select ... for update  :加X锁
-    - select ... lock in share mode ：加S锁
+    - **select ... for update  :加X锁**
+    - **select ... lock in share mode ：加S锁**
 - 自增长与锁
   - 主键自增长加锁，保证高并发下安全。innodb行锁考虑插入问题
   - MYISAM是表锁，粗暴简单无效考虑插入问题。
@@ -378,9 +378,9 @@ InnoDB索引支持一下几种常见的索引:
 ##### 锁的算法
 
 - 行锁的3种算法（Innodb）
-  - Record Lock：单个行记录上的锁（主键隐式的进行锁定）
-  - Gap Lock：间隙锁，锁定一个范围，但不包含记录本身
-  - Next-Key Lock： Gap Lock + Record Lock，锁定一个范围，并且锁定记录本身。（innodb行锁采用这种算法）
+  - **Record Lock：单个行记录上的锁（主键隐式的进行锁定）**
+  - **Gap Lock：间隙锁，锁定一个范围，但不包含记录本身**
+  - **Next-Key Lock： Gap Lock + Record Lock，锁定一个范围，并且锁定记录本身。（innodb行锁采用这种算法）**
 
 - 解决phantom problem（幻读）
   - **innodb repeatable read采用Next-Key Lock算法阻止幻读，oracle则需要serializable事务隔离级别**
@@ -435,9 +435,9 @@ A、D通过redo log ，C通过undo log
 - mysql数据库分布式事务
   - ![](..\截图\分布式事务模型.png)
   - 允许多个独立的事务资源（）
-  - XA（eXtended Architecture）事务
+  - XA（**eXtended Architecture**）事务
   - innodb使用分布式事务，事务隔离级别必须是serializable，
-  - 2阶段提交(two-phase commit)
+  - **2阶段提交(two-phase commit)**
 
 ##### 不好的事务习惯
 
@@ -702,7 +702,7 @@ UPDATE：插入一条新数据，保存当前系统版本号作为创建版本�
 
 
 
-**MVCC 只作用于 RC（Read Committed）和 RR（Repeatable Read）级别**，因为 RU（Read Uncommitted）总是读取最新的数据版本，而不是符合当前事务版本的数据行。而 Serializable 则会对所有读取的行都加锁。这两种级别都不需要 MVCC 的帮助。 
+**MVCC 只作用于 RC（Read Committed）和 RR（Repeatable Read）级别**，因为 **RU（Read Uncommitted）总是读取最新的数据版本，而不是符合当前事务版本的数据行。而 Serializable 则会对所有读取的行都加锁。这两种级别都不需要 MVCC 的帮助。** 
 
 最初我也是坚信这个说法的，但是后面发现在某些场景下这个说法其实有点问题。
 
@@ -872,7 +872,7 @@ union：**对两个结果集进行并集操作，会进行去重，记录不会�
 
 ### 15.B+树中一个节点到底多大合适？
 
-页或页的倍数最为合适。因为如果一个节点的大小小于1页，那么读取这个节点的时候其实也会读出1页，造成资源的浪费。所以为了不造成浪费，所以最后把一个节点的大小控制在1页、2页、3页等倍数页大小最为合适。
+**页或页的倍数最为合适**。因为如果一个节点的大小小于1页，那么读取这个节点的时候其实也会读出1页，造成资源的浪费。所以为了不造成浪费，所以最后把一个节点的大小控制在1页、2页、3页等倍数页大小最为合适。
 
 这里说的“页”是 MySQL 自定义的单位（和操作系统类似），**MySQL 的 Innodb 引擎中1页的默认大小是16k**，可以使用命令SHOW GLOBAL STATUS LIKE 'Innodb_page_size' 查看。
 
@@ -897,6 +897,8 @@ Innodb中，B+树中的一个节点存储的内容是：
 InnoDB 会将那些热点数据和一些 InnoDB 认为即将访问到的数据存在 Buffer Pool 中，以提升数据的读取性能。
 
 InnoDB 在修改数据时，如果数据的页在 Buffer Pool 中，则会直接修改 Buffer Pool，此时我们称这个页为**脏页**，InnoDB 会以一定的频率将脏页刷新到磁盘，这样可以尽量减少磁盘I/O，提升性能。
+
+mysql8.0去除缓存。
 
 ### 18.InnoDB 四大特性知道吗？？？？？？
 
@@ -998,7 +1000,7 @@ select * from table：不加锁
 
 ### 20.InnoDB 的行锁是怎么实现的？
 
-InnoDB 行锁是通过索引上的索引项来实现的。意味者：只有通过索引条件检索数据，InnoDB 才会使用行级锁，否则，InnoDB将使用表锁！
+InnoDB 行锁是**通过索引上的索引项来实现**的。意味者：只有通过索引条件检索数据，InnoDB 才会使用行级锁，否则，InnoDB将使用表锁！
 
  
 
@@ -1008,11 +1010,11 @@ InnoDB 行锁是通过索引上的索引项来实现的。意味者：只有通�
 
 ### 21.InnoDB 锁的算法有哪几种？
 
-Record lock：记录锁，单条索引记录上加锁，锁住的永远是索引，而非记录本身。
+Record lock：记录锁，单条索引记录上加锁，锁住的永远是索引，而非记录本身。 (select name from user_table where id = 1 for update)
 
-Gap lock：**间隙锁**，在索引记录之间的间隙中加锁，或者是在某一条索引记录之前或者之后加锁，并不包括该索引记录本身。
+Gap lock：**间隙锁**，在索引记录之间的间隙中加锁，或者是在某一条索引记录之前或者之后加锁，并不包括该索引记录本身。(select name from user_table where id < 2 for update)
 
-Next-key lock：Record lock 和 Gap lock 的结合**，即除了锁住记录本身，也锁住索引之间的间隙。**
+Next-key lock：Record lock 和 Gap lock 的结合**，即除了锁住记录本身，也锁住索引之间的间隙。 (select name from user_table where id < =2 for update)**
 
 
 
@@ -1020,7 +1022,7 @@ Next-key lock：Record lock 和 Gap lock 的结合**，即除了锁住记录本�
 
 乐观锁：更新时带上版本号（cas更新）
 
-悲观锁：使用共享锁和排它锁，select...lock in share mode，select…for update。
+**悲观锁：使用共享锁和排它锁，select...lock in share mode，select…for update**。
 
 ### 23.InnoDB 和 MyISAM 的区别？
 

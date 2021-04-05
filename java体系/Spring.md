@@ -333,7 +333,27 @@ public class TestBean implements BeanFactoryPostProcessor {
 }
 ```
 
+#### 24.事务的传播行为
 
+PROPAGION_XXX :事务的传播行为
+
+\* 保证同一个事务中
+
+**PROPAGATION_REQUIRED 支持当前事务，如果不存在 就新建一个(默认)**
+
+PROPAGATION_SUPPORTS 支持当前事务，如果不存在，就不使用事务
+
+PROPAGATION_MANDATORY 支持当前事务，如果不存在，抛出异常
+
+\* 保证没有在同一个事务中
+
+PROPAGATION_REQUIRES_NEW 如果有事务存在，挂起当前事务，创建一个新的事务
+
+PROPAGATION_NOT_SUPPORTED 以非事务方式运行，如果有事务存在，挂起当前事务
+
+PROPAGATION_NEVER 以非事务方式运行，如果有事务存在，抛出异常
+
+PROPAGATION_NESTED 如果当前事务存在，则嵌套事务执行
 
 
 
@@ -413,11 +433,150 @@ Caused by: org.springframework.beans.factory.BeanCurrentlyInCreationException:
 
 
 
-
-
-
-
 ## springboot分析
+
+### 1.Spring Boot 的核心注解是哪个？它主要由哪几个注解组成的？
+
+启动类上面的注解是@SpringBootApplication，它也是 **Spring Boot 的核心注解**，主要组合包含了以下 3 个注解：
+
+1. **@SpringBootConfiguration**：组合了 @Configuration 注解，**实现配置文件的功能**。
+2. @EnableAutoConfiguration：**打开自动配置的功能，也可以关闭某个自动配置的选项**，如关闭数据源自动配置功能：**@SpringBootApplication(exclude{DataSourceAutoConfiguration.class})**
+3. **@ComponentScan：Spring组件扫描。**
+
+
+
+### 2.配置
+
+#### 1.什么是 JavaConfig？
+
+Spring JavaConfig 是 Spring 社区的产品，它提供了配置 Spring IoC 容器的纯Java 方法。因此它有助于避免使用 XML 配置。使用 JavaConfig 的优点在于：
+
+ （1）面向对象的配置。由于配置被定义为 JavaConfig 中的类，因此用户可以充分利用 Java 中的面向对象功能。一个配置类可以继承另一个，重写它的@Bean 方法等。
+
+（2）减少或消除 XML 配置。基于依赖注入原则的外化配置的好处已被证明。但是，许多开发人员不希望在 XML 和 Java 之间来回切换。JavaConfig 为开发人员提供了一种纯 Java 方法来配置与 XML 配置概念相似的 Spring 容器。从技术角度来讲，只使用 JavaConfig 配置类来配置容器是可行的，但实际上很多人认为将JavaConfig 与 XML 混合匹配是理想的。
+
+（3）类型安全和重构友好。JavaConfig 提供了一种类型安全的方法来配置 Spring容器。由于 Java 5.0 对泛型的支持，现在可以按类型而不是按名称检索 bean，不需要任何强制转换或基于字符串的查找。
+
+#### 2.Spring Boot 自动配置原理是什么？
+
+注解 @EnableAutoConfiguration, @Configuration, @ConditionalOnClass 就是**自动配置的核心**，
+
+**@EnableAutoConfiguration 给容器导入META-INF/spring.factories 里定义的自动配置类**。
+
+**筛选有效的自动配置类**。
+
+每一个自动配置类结合对应的 xxxProperties.java 读取配置文件进行自动配置功能
+
+#### 3.你如何理解 Spring Boot 配置加载顺序？
+
+在 Spring Boot 里面，可以使用以下几种方式来加载配置。
+
+1）properties文件；
+
+2）YAML文件；
+
+3）系统环境变量；
+
+4）命令行参数；
+
+等等……
+
+#### 4.Spring Boot 是否可以使用 XML 配置 ?
+
+- Spring Boot 推荐使用 Java 配置而非 XML 配置，但是 Spring Boot 中也可以使用 XML 配置，**通过 @ImportResource 注解可以引入一个 XML 配置**。
+
+- @PropertySource注解，目的是加载指定的属性文件
+
+#### 5.spring boot 核心配置文件是什么？bootstrap.properties 和 application.properties 有何区别 ?
+
+单纯做 Spring Boot 开发，可能不太容易遇到 bootstrap.properties 配置文件，但是在结合 Spring Cloud 时，这个配置就会经常遇到了，特别是在需要加载一些远程配置文件的时侯。
+
+spring boot 核心的两个配置文件：
+
+- bootstrap (. yml 或者 . properties)：boostrap 由父 **ApplicationContext** 加载的，比 applicaton 优先加载，配置在应用程序上下文的引导阶段生效。一般来说我们在 Spring Cloud Config 或者 Nacos 中会用到它。且 boostrap 里面的属性不能被覆盖；
+- application (. yml 或者 . properties)：**由ApplicatonContext 加载，用于 spring boot 项目的自动化配置**。
+
+#### 6.如何在自定义端口上运行 Spring Boot 应用程序？
+
+为了在自定义端口上运行 Spring Boot 应用程序，您可以在application.properties 中指定端口。server.port = 8090
+
+
+
+### 安全
+
+#### 1.如何实现 Spring Boot 应用程序的安全性？
+
+为了实现 Spring Boot 的安全性，我们使用 spring-boot-starter-security 依赖项，并且必须添加安全配置。它只需要很少的代码。配置类将必须扩展WebSecurityConfigurerAdapter 并覆盖其方法。
+
+
+
+#### 2.比较一下 Spring Security 和 Shiro 各自的优缺点 ?
+
+由于 Spring Boot 官方提供了大量的非常方便的开箱即用的 Starter ，包括 Spring Security 的 Starter ，使得在 Spring Boot 中使用 Spring Security 变得更加容易，甚至只需要添加一个依赖就可以保护所有的接口，所以，如果是 Spring Boot 项目，一般选择 Spring Security 。当然这只是一个建议的组合，单纯从技术上来说，无论怎么组合，都是没有问题的。Shiro 和 Spring Security 相比，主要有如下一些特点：
+
+1. Spring Security 是一个重量级的安全管理框架；Shiro 则是一个轻量级的安全管理框架
+2. Spring Security 概念复杂，配置繁琐；Shiro 概念简单、配置简单
+3. Spring Security 功能强大；Shiro 功能简单
+
+#### **Spring Boot 中如何解决跨域问题 ?**
+
+跨域可以在前端通过 JSONP 来解决，但是 JSONP 只可以发送 GET 请求，无法发送其他类型的请求，在 RESTful 风格的应用中，就显得非常鸡肋，因此我们推荐在后端通过 （CORS，Cross-origin resource sharing） 来解决跨域问题。这种解决方案并非 Spring Boot 特有的，在传统的 SSM 框架中，就可以通过 CORS 来解决跨域问题，只不过之前我们是在 XML 文件中配置 CORS ，现在可以通过实现WebMvcConfigurer接口然后重写addCorsMappings方法解决跨域问题。
+
+#### Spring Boot 中的监视器是什么？
+
+Spring boot actuator 是 spring 启动框架中的重要功能之一。Spring boot 监视器可帮助您访问生产环境中正在运行的应用程序的当前状态。有几个指标必须在生产环境中进行检查和监控。即使一些外部应用程序可能正在使用这些服务来向相关人员触发警报消息。监视器模块公开了一组可直接作为 HTTP URL 访问的REST 端点来检查状态。
+
+ 
+
+**如何在 Spring Boot 中禁用 Actuator 端点安全性？**
+
+默认情况下，所有敏感的 HTTP 端点都是安全的，只有具有 ACTUATOR 角色的用户才能访问它们。安全性是使用标准的 HttpServletRequest.isUserInRole 方法实施的。我们可以使用来禁用安全性。只有在执行机构端点在防火墙后访问时，才建议禁用安全性。
+
+
+
+### 运行 Spring Boot 有哪几种方式？
+
+1）打包用命令或者放到容器中运行
+
+2）用 Maven/ Gradle 插件运行
+
+3）直接执行 main 方法运行
+
+### Spring Boot 需要独立的容器运行吗？
+
+可以不需要，**内置了 Tomcat/ Jetty 等容器。**
+
+### 开启 Spring Boot 特性有哪几种方式？
+
+1）继承spring-boot-starter-parent项目
+
+2）导入spring-boot-dependencies项目依赖
+
+
+
+### Spring Boot 中如何实现定时任务 ?
+
+定时任务也是一个常见的需求，Spring Boot 中对于定时任务的支持主要还是来自 Spring 框架。
+
+在 Spring Boot 中使用定时任务主要有两种不同的方式，一个就是使用 Spring 中的 @Scheduled 注解，另一个则是使用第三方框架 Quartz。
+
+使用 Spring 中的 @Scheduled 的方式主要通过 @Scheduled 注解来实现。
+
+使用 Quartz ，则按照 Quartz 的方式，定义 Job 和 Trigger 即可。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -141,25 +141,6 @@ public static void filter(List<String> names, Predicate condition){
 }
 ```
 
-- JButton使用
-
-```java
-private void lambdaTrans(){
-        JButton show = new JButton("Show");
-//        show.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Event handling without lambda expression is boring");
-//            }
-//        });
-
-        show.addActionListener((e) -> {
-            System.out.println("Light, Camera, Action !! Lambda expressions Rocks");
-        });
-
-    }
-```
-
 - lambda对象比较
 
 ```java
@@ -794,10 +775,16 @@ sleep方法可以让线程进入WAITING状态，并且不占用CPU资源，但�
 线程之间通信有共享内存和消息传递，java才有共享内存。详见JMM
 
 - Object类 wait、notify、notifyAll方法
+
 - JUC中ReentrantLock：newCondition方法、Condition：await、signal、signalAll方法
   **ReentrantLock和管理多个Condition对象，形成多管道锁。**
+  
+  
 
+#### 3.独占和共享锁
 
+- ReentrantLock synchronized等独占锁
+- CountdownLatch、CylicBarrier、Semephore属于共享锁
 
 #### 2.ThreadPoolTaskExecutor
 
@@ -844,8 +831,8 @@ sleep方法可以让线程进入WAITING状态，并且不占用CPU资源，但�
 
 特点
 
-- 停顿时间不超过10ms
-- 停顿时间不会随着堆增大而增加
+- **停顿时间不超过10ms**
+- **停顿时间不会随着堆增大而增加**
 - 支持8MB~4TB级别堆（未来16TB）
 
 #### GC之痛
@@ -862,9 +849,9 @@ Garbage Collection:垃圾收技术
 Garbage Collector:垃圾收集器
 Garbage Collecting:垃圾收集动作
 
-- Mutator：生成垃圾角色
+- Mutator：**生成垃圾角色**
 - TLAB（Thread local allocation buffer）
-  基于CAS独享线程可以优先分配Eden中一块内存。
+  **基于CAS独享线程可以优先分配Eden中一块内存。**
 - Card Table
   卡表：
 
