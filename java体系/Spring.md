@@ -10,7 +10,9 @@
 
 #### 1.Spring IoC 的容器构建流程
 
-AbstractApplicationContext的refresh方法
+**AbstractApplicationContext的refresh方法**
+
+不管spring还是spring boot都以该部分为核心
 
 #### 2.Spring bean的生命周期
 
@@ -39,17 +41,19 @@ bean 的生命周期主要有以下几个阶段，深色底的5个是比较重�
 
 #### 5.Spring 的 AOP 是怎么实现的
 
-本质是通过动态代理来实现的，主要有以下几个步骤。
+本质是**通过动态代理**来实现的，主要有以下几个步骤。
 
 1、获取增强器，例如被 Aspect 注解修饰的类。
 
-2、在创建每一个 bean 时，会检查是否有增强器能应用于这个 bean，简单理解就是该 bean 是否在该增强器指定的 execution 表达式中。如果是，则将增强器作为拦截器参数，使用动态代理创建 bean 的代理对象实例。
+2、在创建每一个 bean 时，会检查是否有增强器能应用于这个 bean，简单理解就是**该 bean 是否在该增强器指定的 execution 表达式中**。如果是，则将增强器作为拦截器参数，使用动态代理创建 bean 的代理对象实例。
 
 3、当我们调用被增强过的 bean 时，就会走到代理类中，从而可以触发增强器，本质跟拦截器类似。
 
+
+
 #### 6.多个AOP的顺序怎么定
 
-通过 Ordered 和 PriorityOrdered 接口进行排序。PriorityOrdered 接口的优先级比 Ordered 更高，如果同时实现 PriorityOrdered 或 Ordered 接口，则再按 order 值排序，值越小的优先级越高。
+**通过 Ordered 和 PriorityOrdered 接口进行排序。PriorityOrdered 接口的优先级比 Ordered 更高**，如果同时实现 PriorityOrdered 或 Ordered 接口，则再按 order 值排序，值越小的优先级越高。
 
 
 
@@ -63,13 +67,13 @@ JDK动态代理，Cglib代理
 
 #### 8.JDK 动态代理和 Cglib 代理的区别
 
-1、JDK 动态代理本质上是实现了被代理对象的接口，而 Cglib 本质上是继承了被代理对象，覆盖其中的方法。
+1、**JDK 动态代理本质上是实现了被代理对象的接口**，而 **Cglib 本质上是继承了被代理对象，覆盖其中的方法**。
 
-2、JDK 动态代理只能对实现了接口的类生成代理，Cglib 则没有这个限制。但是 Cglib 因为使用继承实现，所以 Cglib 无法代理被 final 修饰的方法或类。
+2、**JDK 动态代理只能对实现了接口的类生成代理，Cglib 则没有这个限制**。但是 Cglib 因为使用继承实现，所以 Cglib 无法代理被 final 修饰的方法或类。
 
 3、在调用代理方法上，JDK 是通过反射机制调用，Cglib是通过FastClass 机制直接调用。FastClass 简单的理解，就是使用 index 作为入参，可以直接定位到要调用的方法直接进行调用。
 
-4、在性能上，JDK1.7 之前，由于使用了 FastClass 机制，Cglib 在执行效率上比 JDK 快，但是随着 JDK 动态代理的不断优化，从 JDK 1.7 开始，JDK 动态代理已经明显比 Cglib 更快了
+4、在性能上，JDK1.7 之前，由于使用了 FastClass 机制，Cglib 在执行效率上比 JDK 快，但是随着 **JDK 动态代理的不断优化，从 JDK 1.7 开始，JDK 动态代理已经明显比 Cglib 更快了**
 
 
 
@@ -77,9 +81,11 @@ JDK动态代理，Cglib代理
 
 根本原因是通过 JDK 动态代理生成的类已经继承了 Proxy 类，所以无法再使用继承的方式去对类实现代理。
 
-#### 10.Spring 的事务传播行为有哪些
 
-1) REQUIRED：**Spring 默认的事务传播级别**，如果上下文中已经存在事务，那么就加入到事务中执行，如果当前上下文中不存在事务，则新建事务执行。
+
+#### 10.Spring 的事务传播行为有哪些 ？7种
+
+1)   REQUIRED：**Spring 默认的事务传播级别**，如果上下文中已经存在事务，那么就加入到事务中执行，如果当前上下文中不存在事务，则新建事务执行。
 
 2）REQUIRES_NEW：每次都会新建一个事务，如果上下文中有事务，则将上下文的事务挂起，当新建事务执行完成以后，上下文事务再恢复执行。
 
@@ -115,11 +121,11 @@ SERIALIZABLE：串行化，最高的隔离级别，对于同一行记录，写�
 
 **比如数据库是可重复读，Spring 是读已提交，这是怎么实现的？**
 
-(以Spring为准，保证当前事务为读取已提交；JDBC提供void setTransactionIsolation(int level) throws SQLException;)
+(以Spring为准**，保证当前事务为读取已提交；JDBC提供void setTransactionIsolation(int level)** throws SQLException;)
 
 **Spring 的事务隔离级别本质上还是通过数据库来控制的，具体是在执行事务前先执行命令修改数据库隔离级别**，命令格式如下：
 
-SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED
+**SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED**
 
 
 
@@ -144,7 +150,7 @@ Spring 是通过**提前暴露 bean 的引用来解决**的，（setter方式，
 
  
 
-Spring 首先使用构造函数创建一个 “不完整” 的 bean 实例（之所以说不完整，是因为此时该 bean 实例还未初始化），并且提前曝光该 bean 实例的 **ObjectFactory**（提前曝光就是将 ObjectFactory 放到 **singletonFactories 缓存--三级**）.
+Spring 首先使用构造函数创建一个 **“不完整” 的 bean 实例**（之所以说不完整，是因为此时该 bean 实例还未初始化），并且提前曝光该 bean 实例的 **ObjectFactory**（提前曝光就是将 ObjectFactory 放到 **singletonFactories 缓存--三级**）.
 
  
 
@@ -171,7 +177,7 @@ B 继续接下来的流程，直至创建完毕，然后返回 A 的创建流程
 
  
 
-这边通过缓存中的 ObjectFactory 拿到的 bean 实例虽然拿到的是 “不完整” 的 bean 实例，**但是由于是单例**，所以后续初始化完成后，该 bean 实例的引用地址并不会变，所以最终我们看到的还是完整 bean 实例。
+这边通过缓存中的 ObjectFactory 拿到的 bean 实例虽然拿到的是 “不完整” 的 bean 实例，**但是由于是单例**，所以**后续初始化完成后，该 bean 实例的引用地址并不会变**，所以最终我们看到的还是**完整 bean 实例**。
 
 #### 15.Spring 能解决构造函数循环依赖吗？
 
@@ -179,7 +185,7 @@ B 继续接下来的流程，直至创建完毕，然后返回 A 的创建流程
 
 为什么无法解决构造函数循环依赖？
 
-“首先使用构造函数创建一个 “不完整” 的 bean 实例”，从这句话可以看出，构造函数循环依赖是无法解决的，因为当构造函数出现循环依赖，我们连 “不完整” 的 bean 实例都构建不出来。
+**“首先使用构造函数创建一个 “不完整” 的 bean 实例”，从这句话可以看出，构造函数循环依赖是无法解决的，因为当构造函数出现循环依赖，我们连 “不完整” 的 bean 实例都构建不出来。**
 
 ####  16.Spring 三级缓存
 
@@ -237,19 +243,19 @@ public class Test {
 
 该题可以拆解成下面3个问题：
 
-1、@PostConstruct 修饰的方法被调用的时间
+**1、@PostConstruct 修饰的方法被调用的时间**
 
-2、bean 实例依赖的其他 bean 被注入的时间，也可理解为属性的依赖注入时间 
+**2、bean 实例依赖的其他 bean 被注入的时间，也可理解为属性的依赖注入时间** 
 
-3、步骤2的时间是否早于步骤1：如果是，则没有问题，如果不是，则有问题
+**3、步骤2的时间是否早于步骤1：如果是，则没有问题，如果不是，则有问题**
 
 解析：
 
-1、PostConstruct 注解被封装在 **CommonAnnotationBeanPostProcessor**中，具体触发时间是在 **postProcessBeforeInitialization** 方法，从 doCreateBean 维度看，则是在 initializeBean 方法里，属于初始化 bean 阶段。
+1、PostConstruct 注解被封装在 **CommonAnnotationBeanPostProcessor**中，具体触发时间是在 **postProcessBeforeInitialization** 方法，从 **doCreateBean** 维度看，则是在 initializeBean 方法里，属于**初始化 bean 阶段**。
 
 2、属性的依赖注入是在 populateBean 方法里，属于属性填充阶段。
 
-3、属性填充阶段位于初始化之前，所以**本题答案为没有问题**。
+3、属性填充阶段位于初始化之前，所以**本题答案为 没有问题**。
 
 #### 20.bean 的 init-method 属性指定的方法里用到了其他 bean 实例，会有问题吗
 
@@ -332,28 +338,6 @@ public class TestBean implements BeanFactoryPostProcessor {
   }
 }
 ```
-
-#### 24.事务的传播行为
-
-PROPAGION_XXX :事务的传播行为
-
-\* 保证同一个事务中
-
-**PROPAGATION_REQUIRED 支持当前事务，如果不存在 就新建一个(默认)**
-
-PROPAGATION_SUPPORTS 支持当前事务，如果不存在，就不使用事务
-
-PROPAGATION_MANDATORY 支持当前事务，如果不存在，抛出异常
-
-\* 保证没有在同一个事务中
-
-PROPAGATION_REQUIRES_NEW 如果有事务存在，挂起当前事务，创建一个新的事务
-
-PROPAGATION_NOT_SUPPORTED 以非事务方式运行，如果有事务存在，挂起当前事务
-
-PROPAGATION_NEVER 以非事务方式运行，如果有事务存在，抛出异常
-
-PROPAGATION_NESTED 如果当前事务存在，则嵌套事务执行
 
 
 
@@ -449,7 +433,7 @@ Caused by: org.springframework.beans.factory.BeanCurrentlyInCreationException:
 
 #### 1.什么是 JavaConfig？
 
-Spring JavaConfig 是 Spring 社区的产品，它提供了配置 Spring IoC 容器的纯Java 方法。因此它有助于避免使用 XML 配置。使用 JavaConfig 的优点在于：
+**Spring JavaConfig** 是 Spring 社区的产品，它提供了配置 Spring IoC 容器的纯Java 方法。因此它有助于避免使用 XML 配置。使用 JavaConfig 的优点在于：
 
  （1）面向对象的配置。由于配置被定义为 JavaConfig 中的类，因此用户可以充分利用 Java 中的面向对象功能。一个配置类可以继承另一个，重写它的@Bean 方法等。
 
@@ -544,7 +528,7 @@ Spring boot actuator 是 spring 启动框架中的重要功能之一。Spring bo
 
 ### Spring Boot 需要独立的容器运行吗？
 
-可以不需要，**内置了 Tomcat/ Jetty 等容器。**
+可以不需要，**内置了 Tomcat/ Jetty /undertow等容器。**
 
 ### 开启 Spring Boot 特性有哪几种方式？
 

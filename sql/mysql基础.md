@@ -16,9 +16,14 @@ select version(); --苏宁 5.7.19-17-log
 
 #### 面试指南
 
-1. **MySql读写IO的操作过程** 
-   https://zhuanlan.zhihu.com/p/89051646
-2. 
+**MySql读写IO的操作过程** 
+https://zhuanlan.zhihu.com/p/89051646
+
+
+
+**mysql日志先行；redis日志后行**
+
+
 
 
 
@@ -32,7 +37,6 @@ select version(); --苏宁 5.7.19-17-log
 2.回滚日志(undo log)
 
 3.二进制日志(bin log)
-
 ```
 
 ### 2数据库连接池
@@ -47,7 +51,6 @@ oracle官网9600并发，连接池2048；验证连接数2048，1024，...，96�
 
 //有限的资源
 //数据库的性能瓶颈时，总是可以将其归为三类：CPU、磁盘、网络
-
 ```
 
 
@@ -886,7 +889,7 @@ Innodb中，B+树中的一个节点存储的内容是：
 
 对于叶子节点：我们假设1行数据大小为1k（对于普通业务绝对够了），那么1页能存16条数据。
 
-对于非叶子节点：key 使用 bigint 则为8字节，指针在 MySQL 中为6字节，一共是14字节，则16k能存放 16 * 1024 / 14 = 1170个。那么一颗高度为3的B+树能存储的数据为：1170 * 1170 * 16 = 21902400（千万级）。
+对于非叶子节点：**key 使用 bigint 则为8字节，指针在 MySQL 中为6字节，一共是14字节，则16k能存放 16 * 1024 / 14 = 1170个。那么一颗高度为3的B+树能存储的数据为：1170 * 1170 * 16 = 21902400（千万级）**。
 
 所以在 **InnoDB 中B+树高度一般为3层时，就能满足千万级的数据存储**。在查找数据时一次页的查找代表一次IO，所以通过主键索引查询通常只需要1-3次 IO 操作即可查找到数据。千万级别对于一般的业务来说已经足够了，所以一个节点为1页，也就是16k是比较合理的。
 
@@ -898,7 +901,7 @@ InnoDB 会将那些热点数据和一些 InnoDB 认为即将访问到的数据�
 
 InnoDB 在修改数据时，如果数据的页在 Buffer Pool 中，则会直接修改 Buffer Pool，此时我们称这个页为**脏页**，InnoDB 会以一定的频率将脏页刷新到磁盘，这样可以尽量减少磁盘I/O，提升性能。
 
-mysql8.0去除缓存。
+**mysql8.0去除缓存。**
 
 ### 18.InnoDB 四大特性知道吗？？？？？？
 
@@ -920,7 +923,7 @@ mysql8.0去除缓存。
 
 **二次写（double write）：**
 
-脏页刷盘风险：InnoDB 的 page size一般是16KB，操作系统写文件是以4KB作为单位，那么每写一个 InnoDB 的 page 到磁盘上，操作系统需要写4个块。于是可能出现16K的数据，写入4K 时，发生了系统断电或系统崩溃，只有一部分写是成功的，这就是 partial page write（部分页写入）问题。这时会出现数据不完整的问题。
+脏页刷盘风险：**InnoDB 的 page size一般是16KB**，操作系统写文件是以4KB作为单位，那么每写一个 InnoDB 的 page 到磁盘上，操作系统需要写4个块。于是可能出现16K的数据，写入4K 时，发生了系统断电或系统崩溃，只有一部分写是成功的，这就是 partial page write（部分页写入）问题。这时会出现数据不完整的问题。
 
 这时是无法通过 redo log 恢复的，因为 redo log 记录的是对页的物理修改，如果页本身已经损坏，重做日志也无能为力。
 
@@ -1010,11 +1013,11 @@ InnoDB 行锁是**通过索引上的索引项来实现**的。意味者：只有
 
 ### 21.InnoDB 锁的算法有哪几种？
 
-Record lock：记录锁，单条索引记录上加锁，锁住的永远是索引，而非记录本身。 (select name from user_table where id = 1 for update)
+**Record lock：记录锁**，单条索引记录上加锁，锁住的永远是索引，而非记录本身。 (select name from user_table where id = 1 for update)
 
-Gap lock：**间隙锁**，在索引记录之间的间隙中加锁，或者是在某一条索引记录之前或者之后加锁，并不包括该索引记录本身。(select name from user_table where id < 2 for update)
+**Gap lock：间隙锁**，在索引记录之间的间隙中加锁，或者是在某一条索引记录之前或者之后加锁，并不包括该索引记录本身。(select name from user_table where id < 2 for update)
 
-Next-key lock：Record lock 和 Gap lock 的结合**，即除了锁住记录本身，也锁住索引之间的间隙。 (select name from user_table where id < =2 for update)**
+**Next-key lock：Record lock 和 Gap lock 的结合，即除了锁住记录本身，也锁住索引之间的间隙。 (select name from user_table where id < =2 for update)**
 
 
 
@@ -1034,7 +1037,7 @@ Next-key lock：Record lock 和 Gap lock 的结合**，即除了锁住记录本�
 
 ### 25.explain 用过吗，有哪些字段分别是啥意思？
 
-
+id序号越大 越先执行；同序号按照从上至下顺序执行。
 
 ### 26.如何做慢 SQL 优化？
 

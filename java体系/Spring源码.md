@@ -85,9 +85,9 @@ testBean.save("tt");
 ```
 
 - ClassPathXmlApplicationContext 执行了配置文件加载到Resource中的动作
-- org.springframework.context.support.AbstractApplicationContext
+- org.springframework.context.support.**AbstractApplicationContext**
       **refresh方法**    
-  - DefaultListableBeanFactory通过反射
+  - **DefaultListableBeanFactory**通过反射
 
 ```java
 /*
@@ -183,17 +183,28 @@ public void refresh() throws BeansException, IllegalStateException {
 //org.springframework.beans.factory.support.DefaultSingletonBeanRegistry 存放三个依赖位置
 class DefaultSingletonBeanRegistry{
     /** Cache of singleton objects: bean name to bean instance. */
-    //一级缓存 存放完整可用的bean对象
+    //一级缓存 存放完整可用的bean对象 Object
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name to ObjectFactory. */
-    //三级缓存  存放创建中bean及其匿名内部类
+    //三级缓存  存放创建中bean及其匿名内部类  ObjectFactory
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance. */
-    //二级缓存  存储创建中实例，AOP代理也在这一层
+    //二级缓存  存储创建中实例，AOP代理也在这一层 Object
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 }
-    
 ```
 
+
+
+### 2.Spring Aware接口
+
+Aware：感知捕获的意思
+
+**作用：辅助Spring bean访问Spring容器。**
+
+- `BeanNameAware`：能够获取bean的名称，即是id
+- `BeanFactoryAware`：获取BeanFactory实例
+- `ApplicationContextAware`：获取`ApplicationContext`
+- `MessageSourceAware`：获取MessageSource

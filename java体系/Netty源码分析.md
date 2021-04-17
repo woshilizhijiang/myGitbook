@@ -9,7 +9,7 @@ netty异步、事件驱动
 #### NIO核心组件：
 
 - Channel
-- Buffer
+- Buffer-ByteBuf
 - Selector
 
 #### Netty核心组件
@@ -92,8 +92,8 @@ ChannelPipeline 为 ChannelHandler 的**链**，提供了一个容器并定义�
 
 #### 1.netty如何解决epoll空轮询问题
 
-- Selector BUG出现的原因
-  若Selector的轮询结果为空，也没有wakeup或新消息处理，则发生空轮询，CPU使用率100%，
+- **Selector BUG出现的原因**
+  **若Selector的轮询结果为空，也没有wakeup或新消息处理，则发生空轮询，CPU使用率100%**，
 
 - Netty的解决办法
 
