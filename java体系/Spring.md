@@ -548,7 +548,49 @@ Spring boot actuator 是 spring 启动框架中的重要功能之一。Spring bo
 
 使用 Quartz ，则按照 Quartz 的方式，定义 Job 和 Trigger 即可。
 
+#### actuator
 
+
+
+```shell
+#配置信息
+#1.maven
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+#2.访问地址
+http://localhost:8082/actuator/
+{
+    "_links":{
+        "self":{
+            "href":"http://localhost:8082/actuator",
+            "templated":false
+        },
+        "health":{
+            "href":"http://localhost:8082/actuator/health",
+            "templated":false
+        },
+        "health-component":{
+            "href":"http://localhost:8082/actuator/health/{component}",
+            "templated":true
+        },
+        "health-component-instance":{
+            "href":"http://localhost:8082/actuator/health/{component}/{instance}",
+            "templated":true
+        },
+        "info":{
+            "href":"http://localhost:8082/actuator/info",
+            "templated":false
+        }
+    }
+}
+
+http://localhost:8082/actuator/health
+
+
+
+```
 
 
 

@@ -48,6 +48,52 @@ ln -s 源文件 现有文件
 
 
 
+#### 7.性能相关几个命令
+
+##### 1.pmap
+
+**名称：**
+
+   pmap - **report memory map of a process**(查看进程的内存映像信息；即进程实际使用内存详情)
+
+**用法**
+
+   pmap [ -x | -d ] [ -q ] pids...
+
+   pmap -V
+
+**选项含义**
+
+   -x  extended    Show the extended format. 显示扩展格式
+
+   **-d device     Show the deviceformat.  显示设备格式**
+
+   -q  quiet     Do not display some header/footerlines. 不显示头尾行
+
+   -V  show version  Displays version of program. 显示版本
+
+**扩展格式和设备格式域：**
+
+​    Address: start address ofmap 映像起始地址
+
+​    Kbytes: size of map in kilobytes 映像大小
+
+​    **RSS: resident set size inkilobytes 驻留集大小**
+
+​    Dirty: dirty pages (both sharedand private) in kilobytes 脏页大小
+
+​    Mode: permissions on map 映像权限: r=read,w=write, x=execute, s=shared, p=private (copy on write) 
+
+​    Mapping: file backing the map ,or '[ anon ]' for allocated memory, or '[ stack ]' for the program stack. 映像支持文件,[anon]为已分配内存[stack]为程序堆栈
+
+​    Offset: offset into the file 文件偏移
+
+​    Device: device name(major:minor) 设备名
+
+##### 2.smaps
+
+
+
 ## 二、操作系统及基础语法
 
 ### 1.账号授信
@@ -88,7 +134,7 @@ mac地址为外部可见，从外面看，bond的mac地址是唯一的，switch�
 
 【bond2】
 平衡策略
-balance-xor（XOR policy）
+balance-xor（XOR policy）	
 方式：
 基于特性的Hash算法传输数据包。
 缺省的策略为：(源MAC地址 XOR 目标MAC地址) % slave数量。 # XRO为异或运算，值不同时结果为1，相同为0
