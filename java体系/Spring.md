@@ -592,9 +592,14 @@ http://localhost:8082/actuator/health
 
 ```
 
+### 5.自定义starter？？？？？？
 
+#### 命名：
 
+- 官方spring-boot-starter-****	;spring-boot-starter-web
+- 自定义：****-spring-boot-starter ;mybatis-spring-boot-starter
 
+#### 开发：
 
 
 

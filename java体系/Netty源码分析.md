@@ -15,9 +15,9 @@ netty异步、事件驱动
 #### Netty核心组件
 
 - Bootstrap & ServerBootstrap
-- Channel
+- **Channel**
 - ChannelFuture
-- EventLoop & EventLoopGroup
+- **EventLoop** & EventLoopGroup
 - ChannelHandler
 - ChannelPipeline
 

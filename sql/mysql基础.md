@@ -33,11 +33,16 @@ https://zhuanlan.zhihu.com/p/89051646
 
 ```markdown
 1.重做日志(redo log)
-
+记录数据库变更记录的文件，用于系统异常crash(掉电)后的恢复操作，可以配置多个(配置这个参数innodb_log_files_in_group)比如 ib_logfile0、 ib_logfile1。
 2.回滚日志(undo log)
-
+也存在于mysql 的ibdata文件，用户记录事务的回滚操作。注在mysql5.6以上版本可以拆开出来，单独文件夹存在。
 3.二进制日志(bin log)
+事务提交之后，记录到归档日志中。
+
+binlog模式：row ,statement,mixed三种模式
 ```
+
+
 
 ### 2数据库连接池
 
