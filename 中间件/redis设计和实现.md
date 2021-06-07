@@ -199,6 +199,22 @@ https://github.com/antirez/redis/tree/6.0
 
 
 
+### 4.Redis介绍
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 题型
 
 ## 基础

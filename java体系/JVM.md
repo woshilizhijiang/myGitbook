@@ -300,3 +300,23 @@ Thread Local Allocation Buffer
 
 
 
+## JVM命令集合
+
+### 1.编译命令
+
+1. javac
+
+   编译java文件为class文件
+
+   用法：javac <options> <source files>
+
+2. java
+   执行类和文件
+   用法：
+   java [-options] class [args...] (执行类)
+   java [-options] -jar [args...] (执行jar文件)
+
+3. javap
+   编译字节码
+   用法：
+   javap <options> <classes>

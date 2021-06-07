@@ -87,19 +87,17 @@ public @interface Retention {
 
   ```java
   List<String> features = Arrays.asList("Lambdas", "Default Method", "Stream API", "Date and Time API");	
-  	//方法一
-  features.forEach((n)->System.out.print.out(n))
-    
-    //方法二
-    // 使用Java 8的方法引用更方便，方法引用由::双冒号操作符标示，
-    // 看起来像C++的作用域解析运算符
-   features.forEach(System.out::println);
-  
+  //方法一
+  features.forEach((n)->System.out.print.out(n));
+      //方法二
+      // 使用Java 8的方法引用更方便，方法引用由::双冒号操作符标示，
+      // 看起来像C++的作用域解析运算符
+      features.forEach(System.out::println);
   //        for (String feature : features) {
   //            System.out.println(feature);
   //        }
   ```
-
+  
 - lambda实现Runnable
 
   ```java
@@ -499,10 +497,6 @@ java.util.concurrent.ThreadPoolExecutor
 
 
 
-
-
-
-
 #### 2.AQS多线程基类
 
 java.util.concurrent.locks.AbstractQueuedSynchronizer
@@ -615,7 +609,7 @@ monitor机制；
 
 锁优化演变历史：（jdk1.5-jdk1.6）
 
-​	对象头信息理解
+对象头信息理解
 
 
 
@@ -723,7 +717,7 @@ if any thread has interrupted the current thread. **The  <i>interrupted status</
    主要是为了**防止死锁和永久等待的发生**，使通信变得可靠，如果不放在同步代码块里面很有可能在第一个线程wait()之前，cpu切换到另一个线程执行，而另一个线程里面执行了所有的notify()，然后又切回来执行wait()但是设计的逻辑是想执行完wait()之后再执行notify()去唤醒它，可是在没有synchronized保护之后就可以在执行wait()之前突然切换进第二个线程方法执行nortify()再切换回来，这样对方都已经把notify()都执行完毕了，这个导致刚进入wait()状态的线程永远没有人去唤醒它，导致死锁的发生。
    sleep本身是针对自己单独线程的，和其他关系并不大，所以并不需要放到同步代码块去做。
 
-4. **为什么线程通信的方法wait(),nitify(),notifyAll()被定义在Object类里？sleep定义在Thread中？**
+4. **为什么线程通信的方法wait(),notify(),notifyAll()被定义在Object类里？sleep定义在Thread中？**
 
    在java中的wait(),notify()和notifyaAll()是**锁级别的操作**，锁是属于某一个对象的，每一个对象的**对象头中都是含有几位用来保存锁的状态**的，所以这个锁实际上是绑定在某一对象中，而并不是线程中。同样道理我们反过来想假设定义这几个方法在线程中，就会造成很大的局限性。我们经常会遇到某一个线程持有多个锁，并且这些锁之间是相互配合的，如果定义在Thread类里面就没有办法去实现这些灵活的逻辑了。所以Java所提供的原始的锁对于每一个对象都是适用的，他就把这样的方法定义在object里面。
    
@@ -915,3 +909,4 @@ Garbage Collecting:垃圾收集动作
 
 
 
+​	
