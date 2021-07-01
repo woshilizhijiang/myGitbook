@@ -14,8 +14,6 @@ find ./ -name "*Test" -type f -exec cp {} ./myfile \;
 
 #### 4.od ： 命令按照不同进制显示文件
 
-
-
 #### 5.ntpdate ： 时间同步
 
 ```shell
@@ -31,8 +29,6 @@ ntpdate -u ntp.api.bz
 echo "*/20 * * * * /usr/sbin/ntpdate -u ntp.api.bz >/dev/null &" >> /var/spool/cron/root
 ```
 
-
-
 #### 6.创建文件几种命令
 
 ```shell
@@ -45,8 +41,6 @@ touch>>file3
 #软连接是一种特殊的文件
 ln -s 源文件 现有文件
 ```
-
-
 
 #### 7.性能相关几个命令
 
@@ -99,8 +93,6 @@ ln -s 源文件 现有文件
 ### 1.账号授信
 
 ```shell
-
-
 
 ```
 
